@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Suinet.Rpc;
+using Suinet.Rpc.Client;
 using Suinet.Rpc.Types;
 using UnityEngine;
 
@@ -21,7 +22,6 @@ public class OnChainStateStore : MonoBehaviour
     private readonly Dictionary<string, OnChainPlayer> _remotePlayers = new Dictionary<string, OnChainPlayer>();
     private ulong _latestEventReadTimeStamp;
     private IJsonRpcApiClient _fullNodeClient;
-    private IJsonRpcApiClient _gatewayClient;
     private string _localPlayerAddress;
 
     private void Awake()
@@ -35,9 +35,7 @@ public class OnChainStateStore : MonoBehaviour
        // _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
         _latestEventReadTimeStamp = 0;
         
-        _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_FULLNODE_ENDPOINT));
-        _gatewayClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_GATEWAY_ENDPOINT));
-
+        _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_ENDPOINT));
         SetLocalPlayerAddress();
         StartCoroutine(GetOnChainUpdateEventsWorker());
     }

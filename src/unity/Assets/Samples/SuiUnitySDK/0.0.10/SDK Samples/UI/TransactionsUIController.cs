@@ -28,14 +28,14 @@ public class TransactionsUIController : MonoBehaviour
             var typeArgs = System.Array.Empty<string>();
             var args = new object[] { SharedCounterObjectId };
             var gasObjectId = GasObjectIdInput.text;
-            var rpcResult = await SuiApi.GatewayClient.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000);
+            var rpcResult = await SuiApi.Client.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000);
             var keyPair = SuiWallet.GetActiveKeyPair();
 
             var txBytes = rpcResult.Result.TxBytes;
             var signature = keyPair.Sign(rpcResult.Result.TxBytes);
             var pkBase64 = keyPair.PublicKeyBase64;
 
-            await SuiApi.GatewayClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64);
+            await SuiApi.Client.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForEffectsCert);
             await RefreshCounter();
         });
 
@@ -50,10 +50,7 @@ public class TransactionsUIController : MonoBehaviour
 
     private async Task RefreshCounter()
     {
-        var rpcClient = new UnityWebRequestRpcClient(SuiConstants.DEVNET_GATEWAY_ENDPOINT);
-        var suiJsonRpcApi = new SuiJsonRpcApiClient(rpcClient);
-
-        var rpcResult = await suiJsonRpcApi.GetObjectAsync(SharedCounterObjectId);
+        var rpcResult = await SuiApi.Client.GetObjectAsync(SharedCounterObjectId);
         Output.text = JsonConvert.SerializeObject(rpcResult.Result, formatting: Formatting.Indented);
     }
 }

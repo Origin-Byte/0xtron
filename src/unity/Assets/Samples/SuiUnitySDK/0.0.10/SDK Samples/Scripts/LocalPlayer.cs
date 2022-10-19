@@ -97,7 +97,7 @@ public class LocalPlayer : MonoBehaviour
         var signature = keyPair.Sign(txBytes); 
         var pkBase64 = keyPair.PublicKeyBase64; 
  
-        var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64); 
+        var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForTxCert); 
         if (!txRpcResult.IsSuccess)
         { 
             Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage);
@@ -178,11 +178,11 @@ public class LocalPlayer : MonoBehaviour
         } 
         else 
         { 
-            gasObjectId = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(_gatewayClient, signer, 1, 10000))[0]; 
+            gasObjectId = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, signer, 1, 10000))[0]; 
             PlayerPrefs.SetString("gasObjectId", gasObjectId); 
         }
         
-        var rpcResult = await _gatewayClient.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000); 
+        var rpcResult = await SuiApi.Client.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000); 
 
         if (rpcResult.IsSuccess) 
         { 

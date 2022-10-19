@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Suinet.Rpc;
+using Suinet.Rpc.Client;
 using Suinet.Rpc.Http;
 using Suinet.Rpc.Types;
 using UnityEngine;
@@ -17,12 +18,7 @@ public class OnChainGameController : MonoBehaviour
     public TileBase playerTile;
     
     public static string onChainStateObjectId = "";
-
-    private IJsonRpcApiClient _fullNodeClient;
-    private IJsonRpcApiClient _gatewayClient;
-
     private Dictionary<string, Vector3Int> _playerPositions;
-
     private HashSet<string> _ongoingRequestIds;
 
     
@@ -30,9 +26,6 @@ public class OnChainGameController : MonoBehaviour
     async void Awake()
     {
         _playerPositions = new Dictionary<string, Vector3Int>();
-        _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_FULLNODE_ENDPOINT));
-        _gatewayClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_GATEWAY_ENDPOINT));
-
         _ongoingRequestIds = new HashSet<string>();
 
         if (PlayerPrefs.HasKey(Constants.ONCHAIN_STATE_OBJECT_ID_KEY)) 
@@ -92,7 +85,7 @@ public class OnChainGameController : MonoBehaviour
         } 
         else
         {
-            var objects = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(_gatewayClient, signer, 1, 10000));
+            var objects = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, signer, 1, 10000));
             if (objects.Count > 0)
             {
                 gasObjectId =  objects[0];
@@ -107,7 +100,7 @@ public class OnChainGameController : MonoBehaviour
         }
 
         var args = new object[] { TimestampService.UtcTimestamp };
-        var rpcResult = await _gatewayClient.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000); 
+        var rpcResult = await SuiApi.Client.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000); 
         var createdObjectId = ""; 
  
         if (rpcResult.IsSuccess) 
@@ -118,10 +111,10 @@ public class OnChainGameController : MonoBehaviour
             var signature = keyPair.Sign(rpcResult.Result.TxBytes); 
             var pkBase64 = keyPair.PublicKeyBase64; 
  
-            var txRpcResult = await _gatewayClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64); 
+            var txRpcResult = await SuiApi.Client.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForEffectsCert); 
             if (txRpcResult.IsSuccess) 
             { 
-                var txEffects = JObject.FromObject(txRpcResult.Result.Effects);
+                var txEffects = JObject.FromObject(txRpcResult.Result.EffectsCert.Effects.Effects);
                 createdObjectId = txEffects.SelectToken("created[0].reference.objectId").Value<string>();
                 Debug.Log("CreatedOnChainPlayerStateAsync. createdObjectId: " + createdObjectId);
             } 
