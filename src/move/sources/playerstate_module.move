@@ -1,4 +1,4 @@
-module origin_byte_game::movement2_module {
+module origin_byte_game::playerstate_module {
     use sui::object::{Self, UID};
     use sui::transfer;
     use sui::tx_context::{Self, TxContext};
