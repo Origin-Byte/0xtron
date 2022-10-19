@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.originbyte.suiunitysdk": {
+      "version": "https://github.com/Origin-Byte/sui-unity-sdk.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "11abc496c76351e6ecb22d152cae81e88206ee0e"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.7",
       "depth": 1,
@@ -158,7 +167,7 @@
     },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.0.2",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
