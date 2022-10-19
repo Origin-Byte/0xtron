@@ -1,0 +1,10 @@
+[package]
+name = "origin_byte_game"
+version = "0.0.2"
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework", rev = "devnet" }
+
+[addresses]
+origin_byte_game =  "0x0"
+sui =  "0000000000000000000000000000000000000002"
