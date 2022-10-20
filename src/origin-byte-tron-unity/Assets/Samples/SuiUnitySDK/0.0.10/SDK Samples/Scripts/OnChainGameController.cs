@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -114,8 +115,7 @@ public class OnChainGameController : MonoBehaviour
             var txRpcResult = await SuiApi.Client.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForEffectsCert); 
             if (txRpcResult.IsSuccess) 
             { 
-                var txEffects = JObject.FromObject(txRpcResult.Result.EffectsCert.Effects.Effects);
-                createdObjectId = txEffects.SelectToken("created[0].reference.objectId").Value<string>();
+                createdObjectId = txRpcResult.Result.EffectsCert.Effects.Effects.Created.First().Reference.ObjectId;
                 Debug.Log("CreatedOnChainPlayerStateAsync. createdObjectId: " + createdObjectId);
             } 
             else 

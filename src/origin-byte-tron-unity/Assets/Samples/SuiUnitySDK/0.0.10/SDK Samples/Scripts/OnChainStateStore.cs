@@ -32,8 +32,8 @@ public class OnChainStateStore : MonoBehaviour
     private void Start()
     {
         // start reading events from 1 second ago
-       // _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
-        _latestEventReadTimeStamp = 0;
+        _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
+       // _latestEventReadTimeStamp = 0;
         
         _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_ENDPOINT));
         SetLocalPlayerAddress();
