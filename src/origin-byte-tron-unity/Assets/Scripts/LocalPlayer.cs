@@ -58,7 +58,9 @@ public class LocalPlayer : MonoBehaviour
 
     private Vector2 GetRandomSpawnPosition()
     {
-        const int MAX_POSITION_VALUE = 400;
+        // for testing
+        const int MAX_POSITION_VALUE = 30;
+        //const int MAX_POSITION_VALUE = 400;
         return new Vector2(Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE),
             Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE));
     }
@@ -100,7 +102,7 @@ public class LocalPlayer : MonoBehaviour
         var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForTxCert); 
         if (!txRpcResult.IsSuccess)
         { 
-            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage);
+//            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage);
         }
         else
         {
