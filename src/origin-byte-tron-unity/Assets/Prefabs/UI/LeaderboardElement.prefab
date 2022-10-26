@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7902297679802088883}
   - component: {fileID: 2420507139724953347}
   m_Layer: 5
-  m_Name: ScoreboardElement
+  m_Name: LeaderboardElement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

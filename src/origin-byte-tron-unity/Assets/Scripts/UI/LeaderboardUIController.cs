@@ -1,10 +1,11 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-public class ScoreboardUIController : MonoBehaviour
+public class LeaderboardUIController : MonoBehaviour
 {
-    public ScoreboardElement scoreboardElementPrefab;
+    public LeaderboardElement scoreboardElementPrefab;
     public Transform scoreboardElementsParent;
 
     public async void Start()
@@ -21,7 +22,8 @@ public class ScoreboardUIController : MonoBehaviour
         {
             var scores = JArray.FromObject(rpcResult.Result.Object.Data.Fields["scores"]);
             var scoreboardElements = scores.ToObject<ScoreboardMoveType[]>();
-
+            scoreboardElements = scoreboardElements.OrderByDescending(s => s.Fields.Score).ToArray();
+            
             foreach (var element in scoreboardElements)
             {
                 var elementGo = Instantiate(scoreboardElementPrefab, scoreboardElementsParent);

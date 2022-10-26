@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class ScoreboardElement : MonoBehaviour
+public class LeaderboardElement : MonoBehaviour
 {
     public TMP_Text playerNameText;
     public TMP_Text scoreText;
