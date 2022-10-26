@@ -33,7 +33,7 @@ public class OnChainStateStore : MonoBehaviour
     {
         // start reading events from 1 second ago
         _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
-       // _latestEventReadTimeStamp = 0;
+        //_latestEventReadTimeStamp = 0;
         
         _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_ENDPOINT));
         SetLocalPlayerAddress();
@@ -64,11 +64,11 @@ public class OnChainStateStore : MonoBehaviour
     private async Task GetOnChainUpdateEventsAsync()
     {
         SetLocalPlayerAddress();
-        var rpcResult = await _fullNodeClient.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 10, 0, 10000000000000 );
+        var rpcResult = await _fullNodeClient.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 10, _latestEventReadTimeStamp + 1, 10000000000000 );
         if (rpcResult.IsSuccess)
         {
             var eventsArray = JArray.FromObject(rpcResult.Result);
-            Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventsArray));
+            //Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventsArray));
             foreach (var movementEvent in eventsArray)
             {
                 if (movementEvent.SelectToken("Event.moveEvent") != null)
@@ -112,9 +112,9 @@ public class OnChainStateStore : MonoBehaviour
                             States.Add(sender, state);
                         }
                     }
-                   // Debug.Log($"DrawSphere: {position.ToVector3()}. sequenceNumber: {sequenceNumber}");
-                  //  GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                  //  cube.transform.position = position.ToVector3() + Vector3.back;
+                    //Debug.Log($"DrawSphere: {position.ToVector3()}. sequenceNumber: {sequenceNumber}");
+                    //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    //cube.transform.position = position.ToVector3() + Vector3.back;
                 }
             }
         }
