@@ -18,13 +18,7 @@ public class LocalPlayer : MonoBehaviour
     private ulong _sequenceNumber;
     private ExplosionController _explosionController;
     private bool _scoreboardUpdated = false;
-
-    void Awake()
-    {
-        var randomPosition = GetRandomSpawnPosition();
-        transform.position = randomPosition;
-    }
-
+    
     async void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -54,15 +48,6 @@ public class LocalPlayer : MonoBehaviour
         _scoreboardUpdated = false;
         StartCoroutine(UpdateOnChainPlayerStateWorker());
         //StartCoroutine(ExplodeAfterDelay(10));
-    }
-
-    private Vector2 GetRandomSpawnPosition()
-    {
-        // for testing
-        const int MAX_POSITION_VALUE = 30;
-        //const int MAX_POSITION_VALUE = 400;
-        return new Vector2(Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE),
-            Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE));
     }
 
     private IEnumerator ExplodeAfterDelay(float delay)
