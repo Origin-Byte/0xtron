@@ -6,20 +6,26 @@ using UnityEngine;
 public class TrailCollider : MonoBehaviour
 {
     public string ownerAddress;
+    
+    // Edgecollider needs 2 starting points
+    public List<Vector2> startPoints = new List<Vector2>();
+    
     private ulong _lastSyncedSequenceNumber = 0;
-    private EdgeCollider2D _edgeCollider;
+    public EdgeCollider2D EdgeCollider;
     private List<Vector2> _points;
-    private bool _isLocalPlayerTrail;
+    public bool IsLocalPlayerTrail;
     
     public void Start()
     {
         if (string.IsNullOrWhiteSpace(ownerAddress))
         {
             ownerAddress = SuiWallet.GetActiveAddress();
-            _isLocalPlayerTrail = true;
+            IsLocalPlayerTrail = true;
         }
-        _edgeCollider = GetComponent<EdgeCollider2D>();
-        _points = _edgeCollider.points.ToList();
+        EdgeCollider = GetComponent<EdgeCollider2D>();
+        EdgeCollider.SetPoints(startPoints);
+        _points = EdgeCollider.points.ToList();
+        EdgeCollider.enabled = false;
     }
 
     void FixedUpdate()
@@ -28,25 +34,37 @@ public class TrailCollider : MonoBehaviour
         {
             var playerState = OnChainStateStore.Instance.States[ownerAddress];
 
-            if (playerState.SequenceNumber != _lastSyncedSequenceNumber)
+           // if (playerState.SequenceNumber > _lastSyncedSequenceNumber)
             {
                 if (playerState.SequenceNumber == 0)
                 {
-                    _points = _edgeCollider.points.ToList();
+                    _points = startPoints;
+                }
+
+                if (!EdgeCollider.enabled && _points.Count > 2)
+                {
+//                    Debug.Log("enable edgecollider" );
+                    EdgeCollider.enabled = true;
                 }
                 
                 // TODO optimization: merge points over the same line
-                _points.Add(playerState.Position.ToVector2());
-                _edgeCollider.SetPoints(_points);
+                var position = playerState.Position;
+                _points.Add(position.ToVector2());
+                
+              //  Debug.Log($"DrawCube: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded} ");
+               // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+              //  cube.transform.position = position.ToVector3() + Vector3.back;
+                
+                EdgeCollider.SetPoints(_points);
                 _lastSyncedSequenceNumber = playerState.SequenceNumber;
 
-                if (playerState.IsExploded && !_isLocalPlayerTrail)
+                if (playerState.IsExploded && !IsLocalPlayerTrail)
                 {
                     Destroy(gameObject);
                 }
             }
         }
-        else if (!_isLocalPlayerTrail)
+        else if (!IsLocalPlayerTrail)
         {
             Destroy(gameObject);
         }

@@ -1,15 +1,20 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class ExplosionController : MonoBehaviour
 {
-    public GameObject objectToSetInactive;
+    public List<GameObject> objectsToSetInactive = new List<GameObject>();
+    public List<GameObject> objectsToSetChildrenInactive = new List<GameObject>();
+    public List<GameObject> objectsToDestroy = new List<GameObject>();
     public Transform explosionRoot;
     public GameObject explosionPrefab;
     public float initialCollisionDetectionDelay;
     public bool useCollisionDetection;
+    public float destroyAfterSeconds = 2f;
+    
     private bool _isCollisionDetectionEnabled;
     
     public bool IsExploded { get; private set; }
@@ -45,16 +50,29 @@ public class ExplosionController : MonoBehaviour
         IsExploded = true;
 
         // TODO rework explosion to event based
-        StartCoroutine(SetInactiveAfter(2f));
+        StartCoroutine(SetInactiveAfter(destroyAfterSeconds));
     }
 
     private IEnumerator SetInactiveAfter(float delay)
     {
-        for(var i=0; i<objectToSetInactive.transform.childCount; i++)
+        foreach (var objectToSetChildrenInactive in objectsToSetChildrenInactive)
         {
-            objectToSetInactive.transform.GetChild(i).gameObject.SetActive(false);
+            for(var i=0; i<objectToSetChildrenInactive.transform.childCount; i++)
+            {
+                objectToSetChildrenInactive.transform.GetChild(i).gameObject.SetActive(false);
+            }
         }
+        
+        foreach (var objectToSetInactive in objectsToSetInactive)
+        {
+            objectToSetInactive.SetActive(false);
+        }
+        
         yield return new WaitForSeconds(delay);
-        objectToSetInactive.SetActive(false);
+
+        foreach (var objectToDestroy in objectsToDestroy)
+        {
+            Destroy(objectToDestroy);
+        }
     }
 }

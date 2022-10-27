@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Suinet.Rpc;
 using Suinet.Rpc.Client;
 using Suinet.Rpc.Types;
@@ -84,14 +85,14 @@ public class LocalPlayer : MonoBehaviour
         var signature = keyPair.Sign(txBytes); 
         var pkBase64 = keyPair.PublicKeyBase64; 
  
-        var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForTxCert); 
+        var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForEffectsCert); 
         if (!txRpcResult.IsSuccess)
         { 
 //            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage);
         }
         else
         {
-//            Debug.Log(JsonConvert.SerializeObject(txRpcResult));
+            //Debug.Log(JsonConvert.SerializeObject(txRpcResult));
         }
     }
     
@@ -128,9 +129,9 @@ public class LocalPlayer : MonoBehaviour
         var onChainPosition = new OnChainVector2(position);
         var onChainVelocity = new OnChainVector2(velocity);
         var args = new object[] { onChainStateObjectId, onChainPosition.x, onChainPosition.y, onChainVelocity.x, onChainVelocity.y, _sequenceNumber++, _explosionController.IsExploded, TimestampService.UtcTimestamp };
-//        Debug.Log($"lp onChainPosition.x: {onChainPosition.x}, onChainPosition.y: {onChainPosition.y}, onChainVelocity.x: {onChainVelocity.x}, onChainVelocity.y {onChainVelocity.y}. isExploded: {_explosionController.IsExploded}");
+       // Debug.Log($"lp onChainPosition.x: {onChainPosition.x}, onChainPosition.y: {onChainPosition.y}, onChainVelocity.x: {onChainVelocity.x}, onChainVelocity.y {onChainVelocity.y}. isExploded: {_explosionController.IsExploded}");
 
-        await ExecuteMoveCallTxAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, "do_update", args, false);
+        await ExecuteMoveCallTxAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, "do_update", args, true);
 
         
         

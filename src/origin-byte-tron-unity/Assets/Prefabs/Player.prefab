@@ -398,6 +398,7 @@ GameObject:
   - component: {fileID: 7012145661161316356}
   - component: {fileID: 2059544352}
   - component: {fileID: 2431083288097992171}
+  - component: {fileID: 2595854988179375759}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -469,11 +470,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 186d3c978462e814b81070597dc293fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToSetInactive: {fileID: 5172060472123097125}
+  objectsToSetInactive: []
+  objectsToSetChildrenInactive: []
+  objectsToDestroy: []
   explosionRoot: {fileID: 0}
   explosionPrefab: {fileID: 7716345040506453545, guid: 7b895b4c321afc24d9c7bd9814e7fc3e, type: 3}
-  initialCollisionDetectionDelay: 2
+  initialCollisionDetectionDelay: 0.4
   useCollisionDetection: 1
+  destroyAfterSeconds: 5
 --- !u!114 &2431083288097992171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -487,6 +491,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldUpOverride: {fileID: 567242141356881861}
+--- !u!114 &2595854988179375759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5172060472123097125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2796c249dcc9c76458d72f9c6fbca5f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentTags:
+  - PlayButtonParent
 --- !u!1001 &5172060471713895589
 PrefabInstance:
   m_ObjectHideFlags: 0

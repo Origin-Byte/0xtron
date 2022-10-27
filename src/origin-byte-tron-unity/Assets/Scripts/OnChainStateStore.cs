@@ -31,7 +31,7 @@ public class OnChainStateStore : MonoBehaviour
 
     private void Start()
     {
-        // start reading events from 1 second ago
+        // start reading events from 60 second ago
         _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
         //_latestEventReadTimeStamp = 0;
         
@@ -64,7 +64,7 @@ public class OnChainStateStore : MonoBehaviour
     private async Task GetOnChainUpdateEventsAsync()
     {
         SetLocalPlayerAddress();
-        var rpcResult = await _fullNodeClient.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 10, _latestEventReadTimeStamp + 1, 10000000000000 );
+        var rpcResult = await _fullNodeClient.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 100, _latestEventReadTimeStamp + 1, 10000000000000 );
         if (rpcResult.IsSuccess)
         {
             var eventsArray = JArray.FromObject(rpcResult.Result);
@@ -112,9 +112,11 @@ public class OnChainStateStore : MonoBehaviour
                             States.Add(sender, state);
                         }
                     }
-                    //Debug.Log($"DrawSphere: {position.ToVector3()}. sequenceNumber: {sequenceNumber}");
-                    //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    //cube.transform.position = position.ToVector3() + Vector3.back;
+                    
+                    // Debug.Log($"DrawCube: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded} ");
+                    // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    // cube.transform.position = position.ToVector3() + Vector3.back;
+
                 }
             }
         }
