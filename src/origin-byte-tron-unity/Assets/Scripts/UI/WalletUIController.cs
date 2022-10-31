@@ -12,6 +12,8 @@ public class WalletUIController : MonoBehaviour
 
     public TMP_InputField ActiveAddressText;
 
+    public Button RequestAirdropButton;
+
 
     private void Start()
     {
@@ -33,5 +35,7 @@ public class WalletUIController : MonoBehaviour
             SuiWallet.RestoreWalletFromMnemonics(MnemonicsInputField.text);
             ActiveAddressText.text = SuiWallet.GetActiveAddress();
         });
+        
+        RequestAirdropButton.onClick.AddListener(async () => await SuiAirdrop.RequestAirdrop(SuiWallet.GetActiveAddress()));
     }
 }
