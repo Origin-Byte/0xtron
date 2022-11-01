@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Suinet.Rpc;
 using Suinet.Rpc.Types;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class LocalPlayer : MonoBehaviour
@@ -17,21 +20,24 @@ public class LocalPlayer : MonoBehaviour
     private bool _scoreboardUpdated = false;
     private string _signer;
     private string _onChainPlayerStateObjectId;
+    private bool _isInitialized;
     
-    async void Start()
+    void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _explosionController = GetComponent<ExplosionController>();
         _sequenceNumber = 0;
-        _rb.velocity = Vector2.up * moveSpeed;
         _scoreboardUpdated = false;
         _signer = SuiWallet.GetActiveAddress();
-        _onChainPlayerStateObjectId = await CreateOnChainPlayerStateAsync();
-        StartCoroutine(UpdateOnChainPlayerStateWorker());
+        _isInitialized = false;
+        Random.InitState((int)(TimestampService.UtcTimestamp % Int32.MaxValue));
+        StartCoroutine(InitializePlayerStateWithRetry(0.1f));
     }
 
     void Update()
     {
+        if (!_isInitialized) return;
+        
         var dir = 0f;
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -51,6 +57,26 @@ public class LocalPlayer : MonoBehaviour
         }
     }
 
+    private IEnumerator InitializePlayerStateWithRetry(float retryPeriod)
+    {
+        do
+        {
+            PlayerPrefs.DeleteKey(Constants.GAS_OBJECT_ID_KEY);
+            var task = CreateOnChainPlayerStateAsync();
+            yield return new WaitUntil(() => task.IsCompleted);
+            _onChainPlayerStateObjectId = task.Result;
+            if (string.IsNullOrWhiteSpace(_onChainPlayerStateObjectId))
+            {
+                yield return new WaitForSeconds(retryPeriod);
+            }
+        } 
+        while (string.IsNullOrWhiteSpace(_onChainPlayerStateObjectId));
+
+        _rb.velocity = Vector2.up * moveSpeed;
+        _isInitialized = true;
+        StartCoroutine(UpdateOnChainPlayerStateWorker());
+    }
+
     private IEnumerator UpdateOnChainPlayerStateWorker() 
     { 
         while (true)
@@ -64,11 +90,6 @@ public class LocalPlayer : MonoBehaviour
      
     private async Task UpdateOnChainPlayerStateAsync(Vector2 position, Vector2 velocity)
     {
-        if (_lastPosition == position && velocity.magnitude < 1.0f)
-        {
-           return;
-        }
-        
         if (string.IsNullOrWhiteSpace(_onChainPlayerStateObjectId))
         {
             Debug.LogError("onChainStateObjectId is null UpdateOnChainPlayerStateAsync early return");
@@ -78,7 +99,7 @@ public class LocalPlayer : MonoBehaviour
         //Debug.Log($"lp position: {position}, velocity: {velocity}");
         var onChainPosition = new OnChainVector2(position);
         var onChainVelocity = new OnChainVector2(velocity);
-       // Debug.Log($"lp onChainPosition.x: {onChainPosition.x}, onChainPosition.y: {onChainPosition.y}, onChainVelocity.x: {onChainVelocity.x}, onChainVelocity.y {onChainVelocity.y}. isExploded: {_explosionController.IsExploded}");
+       // Debug.Log($"UpdateOnChainPlayerStateAsync onChainPosition.x: {onChainPosition.x}, onChainPosition.y: {onChainPosition.y}, onChainVelocity.x: {onChainVelocity.x}, onChainVelocity.y {onChainVelocity.y}. isExploded: {_explosionController.IsExploded}");
 
        var moveCallTx = new MoveCallTransaction()
         {
@@ -88,18 +109,16 @@ public class LocalPlayer : MonoBehaviour
             Function = "do_update",
             TypeArguments = ArgumentBuilder.BuildTypeArguments(),
             Arguments = ArgumentBuilder.BuildArguments( _onChainPlayerStateObjectId, onChainPosition.x, onChainPosition.y, onChainVelocity.x, onChainVelocity.y, _sequenceNumber++, _explosionController.IsExploded, TimestampService.UtcTimestamp ),
-            Gas = await GetGasObjectId(_signer),
+            Gas = await GetGasObjectIdAsync(_signer),
             GasBudget = 5000,
             RequestType = SuiExecuteTransactionRequestType.ImmediateReturn
         };
            
         await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
         
-        _lastPosition = position;
-
         if (_explosionController.IsExploded && ! _scoreboardUpdated)
         {
-            await UpdateScoreboard(_onChainPlayerStateObjectId);
+            await UpdateScoreboardAsync(_onChainPlayerStateObjectId);
         }
     }
 
@@ -113,7 +132,7 @@ public class LocalPlayer : MonoBehaviour
             Function = "create_playerstate_for_sender",
             TypeArguments = ArgumentBuilder.BuildTypeArguments(),
             Arguments = ArgumentBuilder.BuildArguments( TimestampService.UtcTimestamp ),
-            Gas = await GetGasObjectId(_signer),
+            Gas = await GetGasObjectIdAsync(_signer),
             GasBudget = 5000,
             RequestType = SuiExecuteTransactionRequestType.WaitForEffectsCert
         };
@@ -135,8 +154,9 @@ public class LocalPlayer : MonoBehaviour
         return createdObjectId; 
     }
     
-    private async Task UpdateScoreboard(string onChainStateObjectId)
+    private async Task UpdateScoreboardAsync(string onChainStateObjectId)
     {
+        Debug.Log("UpdateScoreBoard");
         var moveCallTx = new MoveCallTransaction()
         {
             Signer = _signer,
@@ -145,27 +165,34 @@ public class LocalPlayer : MonoBehaviour
             Function = "add_to_scoreboard",
             TypeArguments = ArgumentBuilder.BuildTypeArguments(),
             Arguments = ArgumentBuilder.BuildArguments( onChainStateObjectId, Constants.SCOREBOARD_OBJECT_ID ),
-            Gas = await GetGasObjectId(_signer),
+            Gas = await GetGasObjectIdAsync(_signer),
             GasBudget = 5000,
             RequestType = SuiExecuteTransactionRequestType.ImmediateReturn
         };
            
-        await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
-        
+        var result = await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
+        Debug.Log("UpdateScoreBoard result: " + JsonConvert.SerializeObject(result)); 
+
         _scoreboardUpdated = true;
     }
     
-    private async Task<string> GetGasObjectId(string address)
+    private async Task<string> GetGasObjectIdAsync(string address)
     {
         var gasObjectId = ""; 
-        if (PlayerPrefs.HasKey("gasObjectId")) 
+        if (PlayerPrefs.HasKey(Constants.GAS_OBJECT_ID_KEY)) 
         { 
-            gasObjectId = PlayerPrefs.GetString("gasObjectId"); 
-        } 
-        else 
-        { 
-            gasObjectId = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, address, 1, 10000))[0]; 
-            PlayerPrefs.SetString("gasObjectId", gasObjectId); 
+            gasObjectId = PlayerPrefs.GetString(Constants.GAS_OBJECT_ID_KEY); 
+        }
+        
+        if (string.IsNullOrWhiteSpace(gasObjectId))
+        {
+            var gasObjects =
+                (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, address, 30, 10000));
+            // sometimes locks get stuck for SUI objects, so try to get random object each time
+            var randomRange = Random.Range(0, gasObjects.Count);
+//            Debug.Log("randomrange:" + randomRange);
+            gasObjectId = gasObjects[randomRange];
+            PlayerPrefs.SetString(Constants.GAS_OBJECT_ID_KEY, gasObjectId); 
         }
 
         return gasObjectId;

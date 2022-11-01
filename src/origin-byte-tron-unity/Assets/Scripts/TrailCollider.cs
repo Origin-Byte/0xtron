@@ -51,9 +51,9 @@ public class TrailCollider : MonoBehaviour
                 var position = playerState.Position;
                 _points.Add(position.ToVector2());
                 
-              //  Debug.Log($"DrawCube: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded} ");
-               // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-              //  cube.transform.position = position.ToVector3() + Vector3.back;
+                Debug.Log($"DrawCube: {position.ToVector3()}. sequenceNumber: {playerState.SequenceNumber}. sender: {ownerAddress}. ");
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.transform.position = position.ToVector3() + Vector3.back;
                 
                 EdgeCollider.SetPoints(_points);
                 _lastSyncedSequenceNumber = playerState.SequenceNumber;

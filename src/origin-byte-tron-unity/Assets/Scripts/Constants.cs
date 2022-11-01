@@ -4,4 +4,5 @@ public class Constants
     public const string ONCHAIN_STATE_OBJECT_ID_KEY = PACKAGE_OBJECT_ID + "_onChainStateObject";
     public const string MODULE_NAME = "playerstate_module";
     public const string SCOREBOARD_OBJECT_ID = "0x59a0cac84c707cb2c89c350a180af4bc0ff2f99c";
+    public const string GAS_OBJECT_ID_KEY = "gasObjectId";
 }

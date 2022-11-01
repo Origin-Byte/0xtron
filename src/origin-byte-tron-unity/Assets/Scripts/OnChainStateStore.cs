@@ -21,7 +21,6 @@ public class OnChainStateStore : MonoBehaviour
     
     private readonly Dictionary<string, OnChainPlayer> _remotePlayers = new Dictionary<string, OnChainPlayer>();
     private ulong _latestEventReadTimeStamp;
-    private IJsonRpcApiClient _fullNodeClient;
     private string _localPlayerAddress;
 
     private void Awake()
@@ -34,8 +33,6 @@ public class OnChainStateStore : MonoBehaviour
         // start reading events from 60 second ago
         _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
         //_latestEventReadTimeStamp = 0;
-        
-        _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_ENDPOINT));
         SetLocalPlayerAddress();
         StartCoroutine(GetOnChainUpdateEventsWorker());
     }
@@ -64,7 +61,7 @@ public class OnChainStateStore : MonoBehaviour
     private async Task GetOnChainUpdateEventsAsync()
     {
         SetLocalPlayerAddress();
-        var rpcResult = await _fullNodeClient.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 100, _latestEventReadTimeStamp + 1, 10000000000000 );
+        var rpcResult = await SuiApi.Client.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 100, _latestEventReadTimeStamp + 1, 10000000000000 );
         if (rpcResult.IsSuccess)
         {
             var eventsArray = JArray.FromObject(rpcResult.Result);

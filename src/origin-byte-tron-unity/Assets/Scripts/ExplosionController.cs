@@ -44,6 +44,7 @@ public class ExplosionController : MonoBehaviour
 
     public void Explode()
     {
+        Debug.Log("Explode");
         var explosionEffect = Instantiate(explosionPrefab, explosionRoot);
         explosionEffect.transform.position = transform.position;
         explosionEffect.gameObject.SetActive(true);
