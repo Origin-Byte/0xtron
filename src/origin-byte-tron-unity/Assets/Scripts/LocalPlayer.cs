@@ -1,12 +1,9 @@
-using System;
 using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Suinet.Rpc;
-using Suinet.Rpc.Client;
 using Suinet.Rpc.Types;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class LocalPlayer : MonoBehaviour
@@ -14,47 +11,23 @@ public class LocalPlayer : MonoBehaviour
     public float moveSpeed = 9.0f;
 
     private Rigidbody2D _rb;
-    private IJsonRpcApiClient _fullNodeClient;
     private Vector2 _lastPosition = Vector2.zero;
     private ulong _sequenceNumber;
     private ExplosionController _explosionController;
     private bool _scoreboardUpdated = false;
+    private string _signer;
+    private string _onChainPlayerStateObjectId;
     
     async void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _explosionController = GetComponent<ExplosionController>();
-        _fullNodeClient = new SuiJsonRpcApiClient(new UnityWebRequestRpcClient(SuiConstants.DEVNET_ENDPOINT));
         _sequenceNumber = 0;
-        
-        var onChainStateObjectId = "";
-        if (PlayerPrefs.HasKey(Constants.ONCHAIN_STATE_OBJECT_ID_KEY))
-        {
-            onChainStateObjectId = PlayerPrefs.GetString(Constants.ONCHAIN_STATE_OBJECT_ID_KEY);
-        }
-        if (!string.IsNullOrWhiteSpace(onChainStateObjectId))
-        {
-           
-            var randomOnChainPosition = new OnChainVector2( transform.position);
-            await ExecuteMoveCallTxAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, "reset",
-                new object[] { onChainStateObjectId, randomOnChainPosition.x, randomOnChainPosition.y, TimestampService.UtcTimestamp}, false);
-        }
-        else 
-        { 
-            Debug.LogWarning("onChainStateObjectId is null, could not call reset.");
-            return;
-        }
-        
         _rb.velocity = Vector2.up * moveSpeed;
         _scoreboardUpdated = false;
+        _signer = SuiWallet.GetActiveAddress();
+        _onChainPlayerStateObjectId = await CreateOnChainPlayerStateAsync();
         StartCoroutine(UpdateOnChainPlayerStateWorker());
-        //StartCoroutine(ExplodeAfterDelay(10));
-    }
-
-    private IEnumerator ExplodeAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        _explosionController.Explode();
     }
 
     void Update()
@@ -78,24 +51,6 @@ public class LocalPlayer : MonoBehaviour
         }
     }
 
-    private async Task ExecuteTransactionAsync(string txBytes)
-    {
-        var keyPair = SuiWallet.GetActiveKeyPair(); 
- 
-        var signature = keyPair.Sign(txBytes); 
-        var pkBase64 = keyPair.PublicKeyBase64; 
- 
-        var txRpcResult = await _fullNodeClient.ExecuteTransactionAsync(txBytes, SuiSignatureScheme.ED25519, signature, pkBase64, SuiExecuteTransactionRequestType.WaitForEffectsCert); 
-        if (!txRpcResult.IsSuccess)
-        { 
-//            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage);
-        }
-        else
-        {
-            //Debug.Log(JsonConvert.SerializeObject(txRpcResult));
-        }
-    }
-    
     private IEnumerator UpdateOnChainPlayerStateWorker() 
     { 
         while (true)
@@ -113,52 +68,95 @@ public class LocalPlayer : MonoBehaviour
         {
            return;
         }
-
-        var onChainStateObjectId = "";
-        if (PlayerPrefs.HasKey(Constants.ONCHAIN_STATE_OBJECT_ID_KEY))
+        
+        if (string.IsNullOrWhiteSpace(_onChainPlayerStateObjectId))
         {
-            onChainStateObjectId = PlayerPrefs.GetString(Constants.ONCHAIN_STATE_OBJECT_ID_KEY);
-        }
-        if (string.IsNullOrWhiteSpace(onChainStateObjectId))
-        {
-            Debug.Log("onChainStateObjectId is null UpdateOnChainPlayerStateAsync early return");
+            Debug.LogError("onChainStateObjectId is null UpdateOnChainPlayerStateAsync early return");
             return;
         }
 
         //Debug.Log($"lp position: {position}, velocity: {velocity}");
         var onChainPosition = new OnChainVector2(position);
         var onChainVelocity = new OnChainVector2(velocity);
-        var args = new object[] { onChainStateObjectId, onChainPosition.x, onChainPosition.y, onChainVelocity.x, onChainVelocity.y, _sequenceNumber++, _explosionController.IsExploded, TimestampService.UtcTimestamp };
        // Debug.Log($"lp onChainPosition.x: {onChainPosition.x}, onChainPosition.y: {onChainPosition.y}, onChainVelocity.x: {onChainVelocity.x}, onChainVelocity.y {onChainVelocity.y}. isExploded: {_explosionController.IsExploded}");
 
-        await ExecuteMoveCallTxAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, "do_update", args, true);
-
-        
+       var moveCallTx = new MoveCallTransaction()
+        {
+            Signer = _signer,
+            PackageObjectId = Constants.PACKAGE_OBJECT_ID,
+            Module = Constants.MODULE_NAME,
+            Function = "do_update",
+            TypeArguments = ArgumentBuilder.BuildTypeArguments(),
+            Arguments = ArgumentBuilder.BuildArguments( _onChainPlayerStateObjectId, onChainPosition.x, onChainPosition.y, onChainVelocity.x, onChainVelocity.y, _sequenceNumber++, _explosionController.IsExploded, TimestampService.UtcTimestamp ),
+            Gas = await GetGasObjectId(_signer),
+            GasBudget = 5000,
+            RequestType = SuiExecuteTransactionRequestType.ImmediateReturn
+        };
+           
+        await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
         
         _lastPosition = position;
 
         if (_explosionController.IsExploded && ! _scoreboardUpdated)
         {
-            args = new object[] { onChainStateObjectId, Constants.SCOREBOARD_OBJECT_ID };
-
-            await ExecuteMoveCallTxAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, "add_to_scoreboard", args, false);
-
-            _scoreboardUpdated = true;
+            await UpdateScoreboard(_onChainPlayerStateObjectId);
         }
     }
 
-    private async Task ExecuteMoveCallTxAsync(string packageObjectId, string module, string function, object[] args, bool immediateReturn)
+    private async Task<string> CreateOnChainPlayerStateAsync()
     {
-        var signer = SuiWallet.GetActiveAddress();
-
-        if (string.IsNullOrWhiteSpace(signer))
+        var moveCallTx = new MoveCallTransaction()
         {
-            Debug.Log("signer is null UpdateOnChainPlayerStateAsync early return");
-            return;
+            Signer = _signer,
+            PackageObjectId = Constants.PACKAGE_OBJECT_ID,
+            Module = Constants.MODULE_NAME,
+            Function = "create_playerstate_for_sender",
+            TypeArguments = ArgumentBuilder.BuildTypeArguments(),
+            Arguments = ArgumentBuilder.BuildArguments( TimestampService.UtcTimestamp ),
+            Gas = await GetGasObjectId(_signer),
+            GasBudget = 5000,
+            RequestType = SuiExecuteTransactionRequestType.WaitForEffectsCert
+        };
+           
+        var txRpcResult = await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
+        
+        var createdObjectId = ""; 
+ 
+        if (txRpcResult.IsSuccess) 
+        { 
+            createdObjectId = txRpcResult.Result.EffectsCert.Effects.Effects.Created.First().Reference.ObjectId;
+            Debug.Log("CreatedOnChainPlayerStateAsync. createdObjectId: " + createdObjectId);
+        } 
+        else 
+        { 
+            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage); 
         }
 
-        var typeArgs = System.Array.Empty<string>(); 
-
+        return createdObjectId; 
+    }
+    
+    private async Task UpdateScoreboard(string onChainStateObjectId)
+    {
+        var moveCallTx = new MoveCallTransaction()
+        {
+            Signer = _signer,
+            PackageObjectId = Constants.PACKAGE_OBJECT_ID,
+            Module = Constants.MODULE_NAME,
+            Function = "add_to_scoreboard",
+            TypeArguments = ArgumentBuilder.BuildTypeArguments(),
+            Arguments = ArgumentBuilder.BuildArguments( onChainStateObjectId, Constants.SCOREBOARD_OBJECT_ID ),
+            Gas = await GetGasObjectId(_signer),
+            GasBudget = 5000,
+            RequestType = SuiExecuteTransactionRequestType.ImmediateReturn
+        };
+           
+        await SuiApi.Signer.SignAndExecuteMoveCallAsync(moveCallTx);
+        
+        _scoreboardUpdated = true;
+    }
+    
+    private async Task<string> GetGasObjectId(string address)
+    {
         var gasObjectId = ""; 
         if (PlayerPrefs.HasKey("gasObjectId")) 
         { 
@@ -166,27 +164,10 @@ public class LocalPlayer : MonoBehaviour
         } 
         else 
         { 
-            gasObjectId = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, signer, 1, 10000))[0]; 
+            gasObjectId = (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, address, 1, 10000))[0]; 
             PlayerPrefs.SetString("gasObjectId", gasObjectId); 
         }
-        
-        var rpcResult = await SuiApi.Client.MoveCallAsync(signer, packageObjectId, module, function, typeArgs, args, gasObjectId, 2000); 
 
-        if (rpcResult.IsSuccess) 
-        { 
-            var txBytes = rpcResult.Result.TxBytes;
-            if (immediateReturn)
-            {
-                ExecuteTransactionAsync(txBytes); // intentionally not awaiting
-            }
-            else
-            {
-                await ExecuteTransactionAsync(txBytes);
-            }
-        } 
-        else 
-        { 
-            Debug.LogError("Something went wrong with the move call: " + rpcResult.ErrorMessage);
-        }
+        return gasObjectId;
     }
 }

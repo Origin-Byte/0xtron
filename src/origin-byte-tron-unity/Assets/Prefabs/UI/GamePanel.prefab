@@ -157,7 +157,6 @@ GameObject:
   - component: {fileID: 3094974119285901776}
   - component: {fileID: 3094974119285901783}
   - component: {fileID: 3094974119285901782}
-  - component: {fileID: 3094974119285901777}
   - component: {fileID: 3094974119285901778}
   m_Layer: 5
   m_Name: GamePanel
@@ -225,20 +224,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3094974119285901777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3094974119285901780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4b4b521bba89924ca65667d889bdb23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tilemap: {fileID: 0}
-  playerTile: {fileID: 11400000, guid: 15d5f3da2fadd15468ecab880beef846, type: 2}
 --- !u!114 &3094974119285901778
 MonoBehaviour:
   m_ObjectHideFlags: 0
