@@ -1,5 +1,10 @@
 # origin-byte-tron
 
+![img1](/imgs/img1.png "on-chain tron game")
+![img2](/imgs/img2.png "on-chain tron game")
+![img3](/imgs/img3.png "on-chain tron game")
+![img4](/imgs/img4.png "on-chain tron game")
+
 .io style multiplayer survival bike racing game. Avoid collision with your and the enemies' trails
 
 ## Play here
@@ -54,12 +59,14 @@ game clients use the Sui blockchain directly as a synchronization backend
 ## Gameplay
 - player can create / import wallet
 - request airdrop if needed
-	- note: you may be rate limited!
+	- note: you may be rate limited, check the official Sui faucet discord channel if it's working https://discord.com/channels/916379725201563759/971488439931392130
 - hit play
-- movement is automatic, turn with A/D or Left/Right arrow buttons
-- survive as long as you can by avoiding trail colliders	
-	
+- players spawn at random positions in the arena
+- forward movement is automatic, turn with A/D or Left/Right arrow buttons
+- survive as long as you can by avoiding trail colliders
 	
 ## Current issues
-- scoreboard is disabled. Writing to the scoreboard stops the event stream from the blockchain for several seconds. Requires further analysis.
+- Leaderboard is disabled right now! Writing to the scoreboard stops the event stream from the blockchain for several seconds. Requires further analysis of the move code and Sui transaction locks.
 - video: https://youtu.be/FTq3Fjr_dBc
+
+## if you encounter issues, please report it with your Sui Address and browser log!
