@@ -1,5 +1,4 @@
 # origin-byte-tron
-=========
 
 .io style multiplayer survival bike racing game. Avoid collision with your and the enemies' trails
 
@@ -63,3 +62,4 @@ game clients use the Sui blockchain directly as a synchronization backend
 	
 ## Current issues
 - scoreboard is disabled. Writing to the scoreboard stops the event stream from the blockchain for several seconds. Requires further analysis.
+- video: https://youtu.be/FTq3Fjr_dBc
