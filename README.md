@@ -3,7 +3,6 @@
 ![img1](/imgs/img1.png "on-chain tron game")
 ![img2](/imgs/img2.png "on-chain tron game")
 ![img3](/imgs/img3.png "on-chain tron game")
-![img4](/imgs/img4.png "on-chain tron game")
 
 .io style multiplayer survival bike racing game. Avoid collision with your and the enemies' trails
 
