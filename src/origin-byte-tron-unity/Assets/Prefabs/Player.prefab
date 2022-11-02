@@ -76,7 +76,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.07716876, y: -0.30634022}
+  m_Offset: {x: 0.0771687, y: 0.10096049}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -87,7 +87,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.0225673, y: 5.52133}
+  m_Size: {x: 2.0225673, y: 1.224261}
   m_EdgeRadius: 0
 --- !u!1 &3692830988374786801
 GameObject:
@@ -477,7 +477,7 @@ MonoBehaviour:
   explosionPrefab: {fileID: 7716345040506453545, guid: 7b895b4c321afc24d9c7bd9814e7fc3e, type: 3}
   initialCollisionDetectionDelay: 0.4
   useCollisionDetection: 1
-  destroyAfterSeconds: 5
+  destroyAfterSeconds: 2
 --- !u!114 &2431083288097992171
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,15 +4,18 @@ using UnityEngine;
 public class OnChainPlayer : MonoBehaviour
 {
     public string ownerAddress;
+    public Transform trailRendererParent;
     
     private Rigidbody2D _rb;
     private ulong _lastSyncedSequenceNumber = 0;
     private ExplosionController _explosionController;
+    private bool _activatedRenderer;
     
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _explosionController = GetComponent<ExplosionController>();
+        _activatedRenderer = false;
     }
 
     void FixedUpdate()
@@ -23,6 +26,11 @@ public class OnChainPlayer : MonoBehaviour
   
             if (playerState.SequenceNumber != _lastSyncedSequenceNumber || playerState.SequenceNumber == 0)
             {
+                if (!_activatedRenderer && playerState.SequenceNumber > 0)
+                {
+                    trailRendererParent.gameObject.SetActive(true);
+                    _activatedRenderer = true;
+                }
                 
                 var onChainPosition = playerState.Position.ToVector2();
                 var onChainVelocity = playerState.Velocity.ToVector2();
@@ -40,7 +48,7 @@ public class OnChainPlayer : MonoBehaviour
                     _explosionController.Explode();
                     Destroy(gameObject);
                 }
- 
+
                 _lastSyncedSequenceNumber = playerState.SequenceNumber;
             }
         }

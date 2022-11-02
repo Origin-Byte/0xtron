@@ -70,6 +70,8 @@ public class OnChainStateStore : MonoBehaviour
             {
                 if (movementEvent.SelectToken("Event.moveEvent") != null)
                 {
+                   // Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventsArray));
+
                     var sender = movementEvent.SelectToken("Event.moveEvent.sender").Value<string>();
                     var bcs = movementEvent.SelectToken("Event.moveEvent.bcs").Value<string>();
                     var timeStamp = movementEvent.SelectToken("Timestamp").Value<ulong>();
@@ -97,20 +99,21 @@ public class OnChainStateStore : MonoBehaviour
                     
                     if (States.ContainsKey(sender)) 
                     {
-                        if (sequenceNumber > States[sender].SequenceNumber || sequenceNumber == 0)
+                        if (isLocalSender && isExploded)
+                        {
+                            States.Remove(sender);
+                        }
+                        else if (sequenceNumber > States[sender].SequenceNumber)
                         {
                             States[sender] = state;
                         }
                     }
-                    else
+                    else if (!isExploded)
                     {
-                        if ((sequenceNumber != 0 || !isLocalSender) && !isExploded)
-                        {
-                            States.Add(sender, state);
-                        }
+                        States.Add(sender, state);
                     }
                     
-                    // Debug.Log($"DrawCube: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded} ");
+                   // Debug.Log($"OnChainUpdate: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded}. States.ContainsKey(sender): {States.ContainsKey(sender)} ");
                     // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     // cube.transform.position = position.ToVector3() + Vector3.back;
 

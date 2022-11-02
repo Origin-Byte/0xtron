@@ -30,6 +30,7 @@ public class LocalPlayer : MonoBehaviour
         _scoreboardUpdated = false;
         _signer = SuiWallet.GetActiveAddress();
         _isInitialized = false;
+        _onChainPlayerStateObjectId = string.Empty;
         Random.InitState((int)(TimestampService.UtcTimestamp % Int32.MaxValue));
         StartCoroutine(InitializePlayerStateWithRetry(0.1f));
     }
@@ -118,7 +119,7 @@ public class LocalPlayer : MonoBehaviour
         
         if (_explosionController.IsExploded && ! _scoreboardUpdated)
         {
-            await UpdateScoreboardAsync(_onChainPlayerStateObjectId);
+            //await UpdateScoreboardAsync(_onChainPlayerStateObjectId);
         }
     }
 

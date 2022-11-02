@@ -60,8 +60,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4633184657010455374}
-  - {fileID: 5172060472080681291}
-  - {fileID: 5172060471156665062}
+  - {fileID: 7443230051903887310}
   m_Father: {fileID: 5172060472123097124}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
@@ -90,12 +89,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5172060471156665063}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5489999, z: 0}
+  m_LocalPosition: {x: 0, y: -0.5490001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 567242141356881861}
-  m_RootOrder: 2
+  m_Father: {fileID: 7443230051903887310}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &5172060471156665049
 TrailRenderer:
@@ -221,12 +220,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5172060472080681288}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.719, z: 0}
+  m_LocalPosition: {x: 0, y: -0.71900016, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 567242141356881861}
-  m_RootOrder: 1
+  m_Father: {fileID: 7443230051903887310}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &5172060472080681290
 TrailRenderer:
@@ -376,6 +375,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerAddress: 
+  trailRendererParent: {fileID: 7443230051903887310}
 --- !u!50 &1734567206921446409
 Rigidbody2D:
   serializedVersion: 4
@@ -409,11 +409,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 186d3c978462e814b81070597dc293fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToSetInactive: {fileID: 5172060472123097125}
+  objectsToSetInactive: []
+  objectsToSetChildrenInactive: []
+  objectsToDestroy: []
   explosionRoot: {fileID: 0}
   explosionPrefab: {fileID: 7716345040506453545, guid: 387f6d8e66e733940b4c8c0c104b8de5, type: 3}
   initialCollisionDetectionDelay: 0
   useCollisionDetection: 0
+  destroyAfterSeconds: 2
+--- !u!1 &8097876028030602537
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7443230051903887310}
+  m_Layer: 0
+  m_Name: TrailRendererParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7443230051903887310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8097876028030602537}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5172060472080681291}
+  - {fileID: 5172060471156665062}
+  m_Father: {fileID: 567242141356881861}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &5172060471713895589
 PrefabInstance:
   m_ObjectHideFlags: 0
