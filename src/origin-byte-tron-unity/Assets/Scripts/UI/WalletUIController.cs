@@ -19,13 +19,16 @@ public class WalletUIController : MonoBehaviour
     {
         ActiveAddressText.text = SuiWallet.GetActiveAddress();
 
-        NewWalletButton.onClick.AddListener(() =>
+        NewWalletButton.onClick.AddListener(async () =>
         {
             var walletmnemo = SuiWallet.CreateNewWallet();
             NewWalletMnemonicsText.gameObject.SetActive(true);
             NewWalletMnemonicsText.text = walletmnemo;
 
-            ActiveAddressText.text = SuiWallet.GetActiveAddress();
+            var activeAddress = SuiWallet.GetActiveAddress();
+            ActiveAddressText.text = activeAddress;
+
+            await SuiAirdrop.RequestAirdrop(activeAddress);
         });
 
 
