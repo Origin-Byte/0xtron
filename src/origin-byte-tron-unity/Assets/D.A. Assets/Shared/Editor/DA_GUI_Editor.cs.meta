@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 01eb77c02364e444e9da3789abe3e2cf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - guiSkin: {fileID: 11400000, guid: bb0873f440e505c468596f971ce46bee, type: 2}
+  - imgLogo: {fileID: 2800000, guid: b27be230f3bc4e44f9756856733485ab, type: 3}
+  - imgViewRecent: {fileID: 2800000, guid: c5969960e1e4115419e4637b3150f937, type: 3}
+  - imgExpandClosed: {fileID: 2800000, guid: 66fe30698810d114b98771ec1a0c77b8, type: 3}
+  - imgExpandOpened: {fileID: 2800000, guid: 8eea54346304a6143b885f9a779afa5d, type: 3}
+  - iconFAQ: {fileID: 2800000, guid: badce6fff8a308a4e83e580e1953a154, type: 3}
+  - iconSupport: {fileID: 2800000, guid: 80224a45b775cda4482869adfc5a4cdd, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
