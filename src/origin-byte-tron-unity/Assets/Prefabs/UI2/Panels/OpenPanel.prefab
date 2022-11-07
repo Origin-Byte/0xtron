@@ -677,6 +677,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8755189697525909021}
     m_Modifications:
+    - target: {fileID: 361341286413230097, guid: a1b7c9a90c5ccce488a136e59bcb8503, type: 3}
+      propertyPath: m_text
+      value: CONNECT WALLET
+      objectReference: {fileID: 0}
     - target: {fileID: 2349771417032488844, guid: a1b7c9a90c5ccce488a136e59bcb8503, type: 3}
       propertyPath: m_Name
       value: Button
