@@ -16,8 +16,9 @@ public class CustomButton : Button
     public Color hoveredTextColor;
     public Color pressedTextColor;
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         onClick.AddListener(() =>
         {
             audioSource.PlayOneShot(clickSound);

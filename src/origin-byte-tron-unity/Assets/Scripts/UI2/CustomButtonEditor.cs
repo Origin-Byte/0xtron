@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
  
+#if UNITY_EDITOR
 [CustomEditor(typeof(CustomButton))]
 public class CustomButtonEditor : Editor
 {
@@ -28,3 +29,4 @@ public class CustomButtonEditor : Editor
         DrawDefaultInspector();
     }
 }
+#endif
