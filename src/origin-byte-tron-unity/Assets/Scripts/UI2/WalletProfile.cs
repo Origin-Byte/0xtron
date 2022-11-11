@@ -19,7 +19,7 @@ public class WalletProfile : MonoBehaviour
         while (true)
         {
             var activeAddress = SuiWallet.GetActiveAddress();
-            if (!string.IsNullOrWhiteSpace(activeAddress))
+            if (activeAddress != "0x")
             {
                 addressText.text = $"{activeAddress.Substring(0, 6)}...{activeAddress.Substring(activeAddress.Length - 4)}";
                 var getBalanceTask = SuiHelper.GetBalanceAsync(SuiApi.Client, activeAddress);
