@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,7 +21,7 @@ public class OnChainStateStore : MonoBehaviour
     public TrailCollider trailColliderPrefab;
     
     private readonly Dictionary<string, OnChainPlayer> _remotePlayers = new Dictionary<string, OnChainPlayer>();
-    private ulong _latestEventReadTimeStamp;
+    private SuiEventEnvelope _latestEvent;
     private string _localPlayerAddress;
 
     private void Awake()
@@ -30,9 +31,7 @@ public class OnChainStateStore : MonoBehaviour
 
     private void Start()
     {
-        // start reading events from 60 second ago
-        _latestEventReadTimeStamp = Convert.ToUInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 1000);
-        //_latestEventReadTimeStamp = 0;
+        _latestEvent = null;
         SetLocalPlayerAddress();
         StartCoroutine(GetOnChainUpdateEventsWorker());
     }
@@ -60,25 +59,41 @@ public class OnChainStateStore : MonoBehaviour
     
     private async Task GetOnChainUpdateEventsAsync()
     {
+//        Debug.Log("GetOnChainUpdateEventsAsync");
         SetLocalPlayerAddress();
-        var rpcResult = await SuiApi.Client.GetEventsByModuleAsync(Constants.PACKAGE_OBJECT_ID, Constants.MODULE_NAME, 100, _latestEventReadTimeStamp + 1, 10000000000000 );
-        if (rpcResult.IsSuccess)
+        var query = new SuiMoveEventEventQuery()
         {
-            var eventsArray = JArray.FromObject(rpcResult.Result);
-            //Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventsArray));
-            foreach (var movementEvent in eventsArray)
+            MoveEvent = $"{Constants.PACKAGE_OBJECT_ID}::playerstate_module::PlayerStateUpdatedEvent"
+        };
+        
+        RpcResult<SuiPage_for_EventEnvelope_and_EventID> rpcResult;
+
+        if (_latestEvent != null)
+        {
+            rpcResult = await SuiApi.Client.GetEventsAsync(query, null, 20, false);
+        }
+        else
+        { 
+            // start from the latest event
+            rpcResult = await SuiApi.Client.GetEventsAsync(query, null, 1, true);
+        }
+        
+//        Debug.Log(JsonConvert.SerializeObject(rpcResult));
+        if (rpcResult != null && rpcResult.IsSuccess)
+        {
+            foreach (var eventData in rpcResult.Result.Data)
             {
-                if (movementEvent.SelectToken("Event.moveEvent") != null)
+                if (eventData.Event.MoveEvent != null)
                 {
-                   // Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventsArray));
+                    //Debug.Log("GetOnChainUpdateEventsAsync: " + JsonConvert.SerializeObject(eventData.Event.MoveEvent));
 
-                    var sender = movementEvent.SelectToken("Event.moveEvent.sender").Value<string>();
-                    var bcs = movementEvent.SelectToken("Event.moveEvent.bcs").Value<string>();
-                    var timeStamp = movementEvent.SelectToken("Timestamp").Value<ulong>();
+                    var sender = eventData.Event.MoveEvent.Sender;
+                    var bcs = eventData.Event.MoveEvent.Bcs;
+                    var timeStamp = eventData.Timestamp;
 
-                    if (timeStamp > _latestEventReadTimeStamp)
+                   // if (timeStamp > _latestEventReadTimeStamp)
                     {
-                        _latestEventReadTimeStamp = timeStamp;
+                   //     _latestEventReadTimeStamp = timeStamp;
                     }
 
                     // BCS conversion

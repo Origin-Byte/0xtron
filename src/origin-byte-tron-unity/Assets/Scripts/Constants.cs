@@ -1,8 +1,7 @@
-public class Constants
+public static class Constants
 {    
-    public const string PACKAGE_OBJECT_ID = "0x1d4214eb303cc27007022d738f8a2ab49597f1e7";
-    public const string ONCHAIN_STATE_OBJECT_ID_KEY = PACKAGE_OBJECT_ID + "_onChainStateObject";
+    public const string PACKAGE_OBJECT_ID = "0x97e3d517deca7fc42447c4ebf7022339a680b2e4";
     public const string MODULE_NAME = "playerstate_module";
-    public const string SCOREBOARD_OBJECT_ID = "0xf6fffaba1c5a76f112752e5811fd25f4ae5723e5";
+    public const string SCOREBOARD_OBJECT_ID = "0x238d7ee3cfb2f0f3c65e0b95e3fe136ae1c487a5";
     public const string GAS_OBJECT_ID_KEY = "gasObjectId";
 }

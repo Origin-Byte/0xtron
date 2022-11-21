@@ -27,8 +27,6 @@ public class WalletUIController : MonoBehaviour
 
             var activeAddress = SuiWallet.GetActiveAddress();
          //   ActiveAddressText.text = activeAddress;
-
-            await SuiAirdrop.RequestAirdrop(activeAddress);
         });
 
 
