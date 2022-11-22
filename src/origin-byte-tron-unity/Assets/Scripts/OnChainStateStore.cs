@@ -23,6 +23,7 @@ public class OnChainStateStore : MonoBehaviour
     private readonly Dictionary<string, OnChainPlayer> _remotePlayers = new Dictionary<string, OnChainPlayer>();
     private SuiEventEnvelope _latestEvent;
     private string _localPlayerAddress;
+    private SuiEventId _nextCursor;
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class OnChainStateStore : MonoBehaviour
     private void Start()
     {
         _latestEvent = null;
+        _nextCursor = null;
         SetLocalPlayerAddress();
         StartCoroutine(GetOnChainUpdateEventsWorker());
     }
@@ -70,7 +72,7 @@ public class OnChainStateStore : MonoBehaviour
 
         if (_latestEvent != null)
         {
-            rpcResult = await SuiApi.Client.GetEventsAsync(query, null, 20, false);
+            rpcResult = await SuiApi.Client.GetEventsAsync(query, _nextCursor, 20, false);
         }
         else
         { 
@@ -81,6 +83,7 @@ public class OnChainStateStore : MonoBehaviour
 //        Debug.Log(JsonConvert.SerializeObject(rpcResult));
         if (rpcResult != null && rpcResult.IsSuccess)
         {
+            _nextCursor = rpcResult.Result.NextCursor;
             foreach (var eventData in rpcResult.Result.Data)
             {
                 if (eventData.Event.MoveEvent != null)
@@ -91,9 +94,9 @@ public class OnChainStateStore : MonoBehaviour
                     var bcs = eventData.Event.MoveEvent.Bcs;
                     var timeStamp = eventData.Timestamp;
 
-                   // if (timeStamp > _latestEventReadTimeStamp)
+                    if (_latestEvent == null || timeStamp > _latestEvent.Timestamp)
                     {
-                   //     _latestEventReadTimeStamp = timeStamp;
+                        _latestEvent = eventData;
                     }
 
                     // BCS conversion
