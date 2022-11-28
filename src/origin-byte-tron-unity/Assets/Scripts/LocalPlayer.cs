@@ -142,14 +142,14 @@ public class LocalPlayer : MonoBehaviour
         
         var createdObjectId = ""; 
  
-        if (txRpcResult.IsSuccess) 
+        if (txRpcResult != null && txRpcResult.IsSuccess) 
         { 
             createdObjectId = txRpcResult.Result.EffectsCert.Effects.Effects.Created.First().Reference.ObjectId;
             Debug.Log("CreatedOnChainPlayerStateAsync. createdObjectId: " + createdObjectId);
         } 
         else 
         { 
-            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult.ErrorMessage); 
+            Debug.LogError("Something went wrong when executing the transaction: " + txRpcResult?.ErrorMessage); 
         }
 
         return createdObjectId; 
@@ -191,7 +191,6 @@ public class LocalPlayer : MonoBehaviour
                 (await SuiHelper.GetCoinObjectIdsAboveBalancesOwnedByAddressAsync(SuiApi.Client, address, 30, 10000));
             // sometimes locks get stuck for SUI objects, so try to get random object each time
             var randomRange = Random.Range(0, gasObjects.Count);
-//            Debug.Log("randomrange:" + randomRange);
             gasObjectId = gasObjects[randomRange];
             PlayerPrefs.SetString(Constants.GAS_OBJECT_ID_KEY, gasObjectId); 
         }

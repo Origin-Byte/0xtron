@@ -17,15 +17,16 @@ public class WalletUIController : MonoBehaviour
 
     private void Start()
     {
-        ActiveAddressText.text = SuiWallet.GetActiveAddress();
+//        ActiveAddressText.text = SuiWallet.GetActiveAddress();
 
-        NewWalletButton.onClick.AddListener(() =>
+        NewWalletButton.onClick.AddListener(async () =>
         {
             var walletmnemo = SuiWallet.CreateNewWallet();
             NewWalletMnemonicsText.gameObject.SetActive(true);
             NewWalletMnemonicsText.text = walletmnemo;
 
-            ActiveAddressText.text = SuiWallet.GetActiveAddress();
+            var activeAddress = SuiWallet.GetActiveAddress();
+         //   ActiveAddressText.text = activeAddress;
         });
 
 
@@ -33,9 +34,9 @@ public class WalletUIController : MonoBehaviour
         {
             NewWalletMnemonicsText.gameObject.SetActive(false);
             SuiWallet.RestoreWalletFromMnemonics(MnemonicsInputField.text);
-            ActiveAddressText.text = SuiWallet.GetActiveAddress();
+            //ActiveAddressText.text = SuiWallet.GetActiveAddress();
         });
         
-        RequestAirdropButton.onClick.AddListener(async () => await SuiAirdrop.RequestAirdrop(SuiWallet.GetActiveAddress()));
+        //RequestAirdropButton.onClick.AddListener(async () => await SuiAirdrop.RequestAirdrop(SuiWallet.GetActiveAddress()));
     }
 }
