@@ -129,7 +129,7 @@ public class OnChainStateStore : MonoBehaviour
     private void UpdateRemotePlayers()
     {
         foreach (var state in States)
-        {
+        { 
             if (state.Key != _localPlayerAddress)
             {
                 if (!_remotePlayers.ContainsKey(state.Key))
