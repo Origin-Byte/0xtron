@@ -23,8 +23,8 @@ public class OnChainStateStore : MonoBehaviour
     private readonly Dictionary<string, OnChainPlayer> _remotePlayers = new Dictionary<string, OnChainPlayer>();
     private string _localPlayerAddress;
     private WebSocketService _webSocketService;
-    private const string WebsocketEndpoint = "ws://pubsub.devnet.sui.io:80";
-
+    //private const string WebsocketEndpoint = "ws://pubsub.devnet.sui.io:80";
+    private const string WebsocketEndpoint = "wss://pubsub.devnet.sui.io:443";
     
     private void Awake()
     {
