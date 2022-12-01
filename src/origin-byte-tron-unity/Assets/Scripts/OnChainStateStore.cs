@@ -61,7 +61,7 @@ public class OnChainStateStore : MonoBehaviour
 
     private void OnWebSocketEvent(string message)
     {
-        //Debug.Log(message);
+//        Debug.Log(message);
         SetLocalPlayerAddress();
 
         var messageData = JsonConvert.DeserializeObject<WebsocketMessage>(message);
@@ -103,6 +103,7 @@ public class OnChainStateStore : MonoBehaviour
             States.Add(sender, state);
         }
 
+        UpdateRemotePlayers();
         // Debug.Log($"OnChainUpdate: {position.ToVector3()}. sequenceNumber: {sequenceNumber}. sender: {sender}. isExploded:{ isExploded}. States.ContainsKey(sender): {States.ContainsKey(sender)} ");
         // GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         // cube.transform.position = position.ToVector3() + Vector3.back;
