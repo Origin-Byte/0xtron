@@ -3,33 +3,31 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    public GameObject camera;
-    private Transform _defaultTransform;
-    private bool _is2dCamera;
-    private CinemachineBrain _brain;
+    public CinemachineVirtualCamera topDownVirtualCamera;
+    public CinemachineVirtualCamera followVirtualCamera;
+    private bool _isTopDownCameraMode;
     
-    void Awake()
-    {
-        _defaultTransform = camera.transform;
-        _brain = camera.GetComponent<CinemachineBrain>();
-    }
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (_is2dCamera)
+            _isTopDownCameraMode = !_isTopDownCameraMode;
+            var topDownCameraPriority = 1;
+            var followCameraPriority = 2;
+            if (_isTopDownCameraMode)
             {
-                _brain.enabled = true;
-            }
-            else
-            {
-                _brain.enabled = false;
-                camera.transform.position = _defaultTransform.position;
-                camera.transform.rotation = _defaultTransform.rotation;
+                topDownCameraPriority = 3;
             }
 
-            _is2dCamera = !_is2dCamera;
+            if (topDownVirtualCamera != null)
+            {
+                topDownVirtualCamera.Priority = topDownCameraPriority;
+            }
+
+            if (followVirtualCamera != null)
+            {
+                followVirtualCamera.Priority = followCameraPriority;
+            }
         }
     }
 }
