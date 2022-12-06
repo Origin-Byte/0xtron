@@ -14,6 +14,10 @@ public class EnsureWalletExists : MonoBehaviour
             Debug.Log("new wallet address created: " + newAddress);
             await SuiAirdrop.RequestAirdrop(newAddress);
         }
+        else
+        {
+            Debug.Log("Using existing wallet with address: " + SuiWallet.GetActiveAddress());
+        }
     }
 
 
