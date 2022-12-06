@@ -12,6 +12,7 @@ using Random = UnityEngine.Random;
 public class LocalPlayer : MonoBehaviour
 {
     public float moveSpeed = 9.0f;
+    public float enableMovementDelay = 11;
 
     private Rigidbody2D _rb;
     private Vector2 _lastPosition = Vector2.zero;
@@ -21,6 +22,7 @@ public class LocalPlayer : MonoBehaviour
     private string _signer;
     private string _onChainPlayerStateObjectId;
     private bool _isInitialized;
+    private float _delayCounter;
     
     void Start()
     {
@@ -32,6 +34,8 @@ public class LocalPlayer : MonoBehaviour
         _isInitialized = false;
         _onChainPlayerStateObjectId = string.Empty;
         Random.InitState((int)(TimestampService.UtcTimestamp % Int32.MaxValue));
+        _delayCounter = enableMovementDelay;
+        StartCoroutine(Countdown());
         StartCoroutine(InitializePlayerStateWithRetry(0.1f));
     }
 
@@ -57,6 +61,15 @@ public class LocalPlayer : MonoBehaviour
             _rb.velocity = _rb.velocity.Rotate(90.0f * dir);
         }
     }
+    
+    private IEnumerator Countdown()
+    {
+        while (_delayCounter > 0)
+        {
+            _delayCounter--;
+            yield return new WaitForSeconds(1);
+        }
+    }
 
     private IEnumerator InitializePlayerStateWithRetry(float retryPeriod)
     {
@@ -73,6 +86,12 @@ public class LocalPlayer : MonoBehaviour
         } 
         while (string.IsNullOrWhiteSpace(_onChainPlayerStateObjectId));
 
+        // wait for countdown
+        do
+        {
+            yield return new WaitForSeconds(retryPeriod);
+        } while (_delayCounter > 0);
+        
         _rb.velocity = Vector2.up * moveSpeed;
         _isInitialized = true;
         StartCoroutine(UpdateOnChainPlayerStateWorker());

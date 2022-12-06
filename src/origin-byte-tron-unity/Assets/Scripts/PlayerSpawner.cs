@@ -10,11 +10,6 @@ public class PlayerSpawner : MonoBehaviour
     public LocalPlayer playerPrefab;
     public TrailCollider trailColliderPrefab;
 
-    private void Awake()
-    {
-        //SpawnPlayer();
-    }
-
     public void SpawnPlayer()
     {
         var player = Instantiate(playerPrefab, playersParent); 
@@ -40,7 +35,7 @@ public class PlayerSpawner : MonoBehaviour
     private Vector2 GetRandomPosition()
     {
         // for testing
-        const int MAX_POSITION_VALUE = 40;
+        const int MAX_POSITION_VALUE = 120;
         //const int MAX_POSITION_VALUE = 400;
         return new Vector2(Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE),
             Random.Range(-MAX_POSITION_VALUE, MAX_POSITION_VALUE));
