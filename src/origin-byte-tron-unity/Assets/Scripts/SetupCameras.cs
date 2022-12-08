@@ -7,13 +7,17 @@ public class SetupCameras : MonoBehaviour
     
     void Start()
     {
-        CinemachineVirtualCamera virtualCamera =
-            GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineVirtualCamera>();
-
+        var virtualCamera = GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = transform;
         virtualCamera.LookAt = transform;
 
-        CinemachineBrain cinemachineBrain = GameObject.FindWithTag("MainCamera").GetComponent<CinemachineBrain>();
+        var cinemachineBrain = GameObject.FindWithTag("MainCamera").GetComponent<CinemachineBrain>();
         cinemachineBrain.m_WorldUpOverride = worldUpOverride;
+        
+        virtualCamera = GameObject.FindWithTag("TopDownVirtualCamera").GetComponent<CinemachineVirtualCamera>();
+        virtualCamera.Follow = transform;
+        
+        virtualCamera = GameObject.FindWithTag("MinimapCamera").GetComponent<CinemachineVirtualCamera>();
+        virtualCamera.Follow = transform;
     }
 }

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - VirtualCamera
   - PlayButtonParent
+  - TopDownVirtualCamera
+  - MinimapCamera
   layers:
   - Default
   - TransparentFX
