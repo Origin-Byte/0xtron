@@ -1531,7 +1531,6 @@ GameObject:
   - component: {fileID: 867986382}
   - component: {fileID: 867986381}
   - component: {fileID: 867986384}
-  - component: {fileID: 867986386}
   - component: {fileID: 867986385}
   m_Layer: 0
   m_Name: Main Camera
@@ -1701,20 +1700,6 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &867986386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867986380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adea09add54f5604bb60778af1fa2ab3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  topDownVirtualCamera: {fileID: 0}
-  followVirtualCamera: {fileID: 0}
 --- !u!1 &890904060
 GameObject:
   m_ObjectHideFlags: 0
@@ -1777,7 +1762,7 @@ MonoBehaviour:
 
     M - toggle minimap
 
-    A/D or Left/Right - turn'
+    WASD or Arrows - turn'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: caed24080b7050a448c269caea5d8ca9, type: 2}
   m_sharedMaterial: {fileID: 5613903719580212583, guid: caed24080b7050a448c269caea5d8ca9, type: 2}

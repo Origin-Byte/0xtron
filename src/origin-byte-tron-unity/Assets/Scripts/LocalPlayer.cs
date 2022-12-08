@@ -44,13 +44,65 @@ public class LocalPlayer : MonoBehaviour
         if (!_isInitialized) return;
         
         var dir = 0f;
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        if (CameraManager.IsTopDownCameraMode)
         {
-            dir = 1f;
+            var currentRot = transform.rotation.eulerAngles;
+            
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                if (FastApproximately(currentRot.z, 0.0f))
+                {
+                    dir = 1f;
+                }
+                else if (FastApproximately(currentRot.z, 180.0f) || FastApproximately(currentRot.z, -180.0f))
+                {
+                    dir = -1f;
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                if (FastApproximately(currentRot.z, 0.0f))
+                {
+                    dir = -1f;
+                }
+                else if (FastApproximately(currentRot.z, 180.0f) || FastApproximately(currentRot.z, -180.0f))
+                {
+                    dir = 1f; 
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                if (FastApproximately(currentRot.z, 90.0f) || FastApproximately(currentRot.z, -270.0f))
+                {
+                    dir = -1f;
+                }
+                else if (FastApproximately(currentRot.z, 270.0f) || FastApproximately(currentRot.z, -90.0f))
+                {
+                    dir = 1f; 
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow) && (FastApproximately(currentRot.z,0.0f) || FastApproximately(currentRot.z,180.0f)))
+            {
+                if (FastApproximately(currentRot.z, 90.0f) || FastApproximately(currentRot.z, -270.0f))
+                {
+                    dir = 1f;
+                }
+                else if (FastApproximately(currentRot.z, 270.0f) || FastApproximately(currentRot.z, -90.0f))
+                {
+                    dir = -1f; 
+                }
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        else
         {
-            dir = -1f;
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                dir = 1f;
+            }
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                dir = -1f;
+            }
         }
 
         if (dir != 0f)
@@ -59,6 +111,18 @@ public class LocalPlayer : MonoBehaviour
             currentRot.z += 90.0f * dir;
             transform.rotation = Quaternion.Euler(currentRot);
             _rb.velocity = _rb.velocity.Rotate(90.0f * dir);
+        }
+    }
+    
+    public static bool FastApproximately(float a, float b, float threshold = 0.01f)
+    {
+        if (threshold > 0f)
+        {
+            return Mathf.Abs(a - b) <= threshold;
+        }
+        else
+        {
+            return FastApproximately(a, b);
         }
     }
     

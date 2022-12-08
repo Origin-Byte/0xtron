@@ -1,3 +1,4 @@
+using System;
 using Cinemachine;
 using UnityEngine;
 
@@ -5,16 +6,17 @@ public class CameraManager : MonoBehaviour
 {
     public CinemachineVirtualCamera topDownVirtualCamera;
     public CinemachineVirtualCamera followVirtualCamera;
-    private bool _isTopDownCameraMode;
-    
+    public static bool IsTopDownCameraMode { private set; get; }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            _isTopDownCameraMode = !_isTopDownCameraMode;
+            IsTopDownCameraMode = !IsTopDownCameraMode;
+
             var topDownCameraPriority = 1;
             var followCameraPriority = 2;
-            if (_isTopDownCameraMode)
+            if (IsTopDownCameraMode)
             {
                 topDownCameraPriority = 3;
             }
