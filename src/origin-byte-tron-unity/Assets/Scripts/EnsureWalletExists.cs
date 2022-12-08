@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Suinet.Rpc;
 using UnityEngine;
 
 public class EnsureWalletExists : MonoBehaviour
@@ -16,7 +15,13 @@ public class EnsureWalletExists : MonoBehaviour
         }
         else
         {
-            Debug.Log("Using existing wallet with address: " + SuiWallet.GetActiveAddress());
+            var address = SuiWallet.GetActiveAddress();
+            Debug.Log("Using existing wallet with address: " + address);
+            if (await SuiHelper.GetBalanceAsync(SuiApi.Client, address) <= 0L)
+            {
+                Debug.Log("Requesting airdrop to address: " + address);
+                await SuiAirdrop.RequestAirdrop(address);
+            }
         }
     }
 
