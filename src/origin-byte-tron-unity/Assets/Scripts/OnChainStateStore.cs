@@ -24,7 +24,7 @@ public class OnChainStateStore : MonoBehaviour
     private string _localPlayerAddress;
     private WebSocketService _webSocketService;
     //private const string WebsocketEndpoint = "ws://pubsub.devnet.sui.io:80";
-    private const string WebsocketEndpoint = "wss://pubsub.devnet.sui.io:443";
+    private const string WebsocketEndpoint = "wss://fullnode.devnet.sui.io:443";
     
     private void Awake()
     {
