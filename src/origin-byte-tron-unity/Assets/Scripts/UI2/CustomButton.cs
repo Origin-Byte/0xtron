@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
 public class CustomButton : Button
 {
     public AudioClip hoverSound;
@@ -33,7 +32,10 @@ public class CustomButton : Button
     protected override void OnEnable()
     {
         base.OnEnable();
-        _image.sprite = defaultImage;
+        if (_image != null)
+        {
+            _image.sprite = defaultImage;
+        }
         text.color = defaultTextColor;
     }
 
@@ -42,13 +44,19 @@ public class CustomButton : Button
         base.OnPointerEnter(eventData);
         audioSource.PlayOneShot(hoverSound);
         text.color = hoveredTextColor;
-        _image.sprite = hoveredImage;
+        if (_image != null)
+        {
+            _image.sprite = hoveredImage;
+        }
     }
 
     public override void OnPointerExit(PointerEventData eventData)
     {
         base.OnPointerExit(eventData);
         text.color = defaultTextColor;
-        _image.sprite = defaultImage;
+        if (_image != null)
+        {
+            _image.sprite = defaultImage;
+        }
     }
 }
