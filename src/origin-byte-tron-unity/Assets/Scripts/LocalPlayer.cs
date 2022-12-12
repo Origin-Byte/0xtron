@@ -81,7 +81,7 @@ public class LocalPlayer : MonoBehaviour
                     dir = 1f; 
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow) && (FastApproximately(currentRot.z,0.0f) || FastApproximately(currentRot.z,180.0f)))
+            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
                 if (FastApproximately(currentRot.z, 90.0f) || FastApproximately(currentRot.z, -270.0f))
                 {
